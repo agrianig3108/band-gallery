@@ -1,0 +1,145 @@
+import React, { useState } from "react";
+
+// BandGallery.jsx - Single-file React component (Tailwind CSS assumed available)
+// Cara pakai: import dan render <BandGallery/> atau preview di canvas.
+
+export default function BandGallery() {
+  const bands = [
+    {
+      name: "The Beatles",
+      img: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=1200&q=80",
+      videoId: "45cYwDMibGo" // Example: Hey Jude (short clip)
+    },
+    {
+      name: "Queen",
+      img: "https://images.unsplash.com/photo-1506152983153-6d2b3e2b0f02?w=1200&q=80",
+      videoId: "fJ9rUzIMcZQ" // Bohemian Rhapsody (live/clip)
+    },
+    {
+      name: "Coldplay",
+      img: "https://images.unsplash.com/photo-1507878866276-a947ef722fee?w=1200&q=80",
+      videoId: "RB-RcX5DS5A" // Viva La Vida (official)
+    },
+    {
+      name: "Radiohead",
+      img: "https://images.unsplash.com/photo-1503428593586-e225b39bddfe?w=1200&q=80",
+      videoId: "u5CVsCnxyXg" // Karma Police
+    },
+    {
+      name: "Nirvana",
+      img: "https://images.unsplash.com/photo-1519681393784-d120267933ba?w=1200&q=80",
+      videoId: "hTWKbfoikeg" // Smells Like Teen Spirit (official)
+    },
+    {
+      name: "Linkin Park",
+      img: "https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=1200&q=80",
+      videoId: "8SbUC-UaAxE" // In The End
+    },
+    {
+      name: "Arctic Monkeys",
+      img: "https://images.unsplash.com/photo-1485579149621-3123dd979885?w=1200&q=80",
+      videoId: "bpOSxM0rNPM" // Do I Wanna Know?
+    },
+    {
+      name: "Muse",
+      img: "https://images.unsplash.com/photo-1497032628192-86f99bcd76bc?w=1200&q=80",
+      videoId: "aS7mY1nX5Yg" // Uprising (example)
+    },
+    {
+      name: "Red Hot Chili Peppers",
+      img: "https://images.unsplash.com/photo-1509336628824-9a2f4e6a2f2a?w=1200&q=80",
+      videoId: "rKJm2oQkzv8" // Dani California (clip)
+    },
+    {
+      name: "Foo Fighters",
+      img: "https://images.unsplash.com/photo-1487215078519-e21cc028cb29?w=1200&q=80",
+      videoId: "srZ3P05I5Lk" // Everlong (live/clip)
+    }
+  ];
+
+  const [nim, setNim] = useState("");
+  const [count, setCount] = useState(1);
+
+  // Ambil digit terakhir NIM. Jika 0, pindah ke digit sebelah kiri sampai menemukan non-zero.
+  // Hasilnya dipakai buat menentukan jumlah band (minimal 1, maksimal banyak = bands.length)
+  function computeCountFromNIM(nimStr) {
+    if (!nimStr) return 1;
+    // ambil hanya karakter angka
+    const digits = nimStr.replace(/[^0-9]/g, "");
+    if (!digits) return 1;
+    let i = digits.length - 1;
+    while (i >= 0) {
+      const d = digits[i];
+      if (d !== "0") {
+        // konversi digit ke angka dan batasi dengan jumlah band
+        const val = parseInt(d, 10);
+        return Math.max(1, Math.min(val, bands.length));
+      }
+      i -= 1; // pindah ke digit sebelah kiri
+    }
+    // jika semua digit 0, fallback 1
+    return 1;
+  }
+
+  function handleApply() {
+    const c = computeCountFromNIM(nim);
+    setCount(c);
+  }
+
+  const selectedBands = bands.slice(0, count);
+
+  return (
+    <div className="min-h-screen bg-gray-50 p-6">
+      <div className="max-w-5xl mx-auto">
+        <header className="mb-6">
+          <h1 className="text-3xl font-bold">Band Gallery</h1>
+          <p className="mt-1 text-sm text-gray-600">
+            Masukkan digit terakhir NIMmu (atau NIM penuh). Jika digit terakhir adalah 0, sistem akan cari digit di sebelah kiri sampai ketemu angka non-zero.
+          </p>
+        </header>
+
+        <div className="flex gap-3 items-center mb-6">
+          <input
+            type="text"
+            value={nim}
+            onChange={(e) => setNim(e.target.value)}
+            placeholder="Masukkan NIM (contoh: 123456789)"
+            className="flex-1 px-3 py-2 border rounded focus:outline-none"
+          />
+          <button onClick={handleApply} className="px-4 py-2 rounded bg-blue-600 text-white">Apply</button>
+          <div className="text-sm text-gray-700">Jumlah band: <strong>{count}</strong></div>
+        </div>
+
+        <section className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {selectedBands.map((b) => (
+            <article key={b.name} className="bg-white rounded shadow p-4">
+              <div className="flex gap-4">
+                <img src={b.img} alt={b.name} className="w-32 h-32 object-cover rounded" />
+                <div>
+                  <h2 className="text-xl font-semibold">{b.name}</h2>
+                  <p className="text-sm text-gray-600 mt-1">Klik play untuk lihat video singkat/band clip.</p>
+                </div>
+              </div>
+
+              <div className="mt-4">
+                <div className="aspect-w-16 aspect-h-9">
+                  <iframe
+                    title={b.name}
+                    src={`https://www.youtube.com/embed/${b.videoId}`}
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                    className="w-full h-64 rounded"
+                  />
+                </div>
+              </div>
+            </article>
+          ))}
+        </section>
+
+        <footer className="mt-8 text-xs text-gray-500">
+          <p>Catatan: Gambar menggunakan foto stok dari Unsplash (link langsung) dan video memakai embed YouTube sebagai contoh. Kamu bisa ganti data di array <code>bands</code> untuk menampilkan band lain atau resource lokal.</p>
+        </footer>
+      </div>
+    </div>
+  );
+}
